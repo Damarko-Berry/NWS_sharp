@@ -12,19 +12,14 @@ namespace NWS_sharp
     public class NWSService
     {
         private readonly HttpClient client = new HttpClient();
-        public string Product { get; set; }
-        public string ContactInfo { get; set; }
+        string Product { get; set; }
+        string ContactInfo { get; set; }
         public Coordinates Coordinates { get; private set; }
-        public Coordinates m_Coordinates
-        {
-            set
-            {
-                Coordinates = value;
-                GetWeather(value);
-            } 
-        }
+        
+
+        public Forecast PreferencedForecast { get; set; } = Forecast.forecast;
         public List<WeatherPeriod> weatherPeriods = new List<WeatherPeriod>();
-        public async Task<string> GetNWSGridPointAsync(Coordinates coordinates, Forecast forecast)
+        async Task<string> GetNWSGridPointAsync(Coordinates coordinates, Forecast forecast)
         {
             string url = $"https://api.weather.gov/points/{coordinates.latitude},{coordinates.longitude}";
             client.DefaultRequestHeaders.Add("User-Agent", $"({Product}, {ContactInfo})");
@@ -36,7 +31,7 @@ namespace NWS_sharp
             Console.WriteLine($"NWS Forecast URL: {forecastUrl}");
             return forecastUrl;
         }
-        public async Task<List<WeatherPeriod>> GetWeatherAsync(Coordinates coordinates, Forecast forecast = Forecast.forecast)
+        async Task<List<WeatherPeriod>> GetWeatherAsync(Coordinates coordinates, Forecast forecast = Forecast.forecast)
         {
             string forecastUrl = await GetNWSGridPointAsync(coordinates, forecast);
 
@@ -45,28 +40,36 @@ namespace NWS_sharp
 
             var periodsJson = data["properties"]["periods"].ToString();
             var weatherPeriods = JsonConvert.DeserializeObject<List<WeatherPeriod>>(periodsJson);
-
-            foreach (var period in weatherPeriods)
-            {
-                Console.WriteLine($"{period.Name}: {period.Temperature}°{period.TemperatureUnit}, {period.ShortForecast}");
-            }
-
             return weatherPeriods;
         }
         public async Task GetWeather(Coordinates coordinates)
         {
-            weatherPeriods = await GetWeatherAsync(coordinates);
+            weatherPeriods = await GetWeatherAsync(coordinates, PreferencedForecast);
         }
-        public NWSService(string product, string contactInfo, Coordinates coordinates)
+        public async Task GetWeather(Coordinates coordinates, Forecast forecast)
+        {
+            weatherPeriods = await GetWeatherAsync(coordinates, forecast);
+        }
+        public async Task GetWeather(Forecast forecast)
+        {
+            weatherPeriods = await GetWeatherAsync(Coordinates, forecast);
+        }
+        public async Task GetWeather()
+        {
+            weatherPeriods = await GetWeatherAsync(Coordinates, PreferencedForecast);
+        }
+        public NWSService(string product, string contactInfo, Coordinates coordinates, Forecast forecast = Forecast.forecast)
         {
             Product = product;
             ContactInfo = contactInfo;
-            m_Coordinates = coordinates;
+            Coordinates = coordinates;
+            PreferencedForecast = forecast;
         }
         public NWSService(string product, string contactInfo)
         {
             Product = product;
             ContactInfo = contactInfo;
+            Coordinates = State.GetState(StateAbrv.DC).Capital;
         }
     }
 }
