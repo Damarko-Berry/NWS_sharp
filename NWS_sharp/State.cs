@@ -15,6 +15,10 @@ namespace NWS_sharp
             MajorCities = new Dictionary<string, Coordinates>();
             switch (code)
             {
+                case StateAbrv.DC:
+                    Name = "District of Columbia"; Capital = new Coordinates(38.89511, -77.03637);
+                    MajorCities.Add("Washington", new Coordinates(38.89511, -77.03637));
+                    break;
                 case StateAbrv.AL: Name = "Alabama"; Capital = new Coordinates(32.377716, -86.300568);
                     MajorCities.Add("Birmingham", new Coordinates(33.520682, -86.802433));
                     MajorCities.Add("Montgomery", new Coordinates(32.379223, -86.307737));

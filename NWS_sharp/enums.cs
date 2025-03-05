@@ -3,6 +3,7 @@ namespace NWS_sharp
 {
     public enum StateAbrv
     {
+        DC,
         AL,
         AK,
         AZ,
