@@ -9,17 +9,18 @@ using Newtonsoft.Json.Linq;
 
 namespace NWS_sharp
 {
+    [Serializable]
     public class NWSService
     {
         private readonly HttpClient client = new HttpClient();
-        string Product { get; set; }
-        string ContactInfo { get; set; }
-        public Coordinates Coordinates { get; private set; }
+        public string Product;
+        public string ContactInfo;
+        public Coordinates Coordinates;
         
 
-        public Forecast PreferencedForecast { get; set; } = Forecast.forecast;
-        public List<WeatherPeriod> weatherPeriods = new List<WeatherPeriod>();
-        async Task<string> GetNWSGridPointAsync(Coordinates coordinates, Forecast forecast)
+        public List<WeatherPeriod> SemiDailyForecast= new List<WeatherPeriod>();
+        public List<WeatherPeriod> HourlyForecast = new List<WeatherPeriod>();
+        async Task<string> GetNWSGridPointAsync(Coordinates coordinates, ForecastType forecast)
         {
             string url = $"https://api.weather.gov/points/{coordinates.latitude},{coordinates.longitude}";
             client.DefaultRequestHeaders.Add("User-Agent", $"({Product}, {ContactInfo})");
@@ -28,10 +29,10 @@ namespace NWS_sharp
 
             var data = JObject.Parse(response);
             string forecastUrl = data["properties"][forecast.ToString()].ToString();
-            Console.WriteLine($"NWS Forecast URL: {forecastUrl}");
+            Console.WriteLine($"NWS ForecastType URL: {forecastUrl}");
             return forecastUrl;
         }
-        async Task<List<WeatherPeriod>> GetWeatherAsync(Coordinates coordinates, Forecast forecast = Forecast.forecast)
+        async Task<List<WeatherPeriod>> GetWeatherAsync(Coordinates coordinates, ForecastType forecast = ForecastType.forecast)
         {
             string forecastUrl = await GetNWSGridPointAsync(coordinates, forecast);
 
@@ -44,26 +45,46 @@ namespace NWS_sharp
         }
         public async Task GetWeather(Coordinates coordinates)
         {
-            weatherPeriods = await GetWeatherAsync(coordinates, PreferencedForecast);
+            HourlyForecast = await GetWeatherAsync(coordinates, ForecastType.forecastHourly);
+            SemiDailyForecast = await GetWeatherAsync(coordinates, ForecastType.forecast);
+
         }
-        public async Task GetWeather(Coordinates coordinates, Forecast forecast)
+        public async Task GetWeather(Coordinates coordinates, ForecastType forecast)
         {
-            weatherPeriods = await GetWeatherAsync(coordinates, forecast);
+            switch (forecast)
+            {
+                case ForecastType.forecastHourly:
+                    HourlyForecast = await GetWeatherAsync(coordinates, forecast);
+                    break;
+                case ForecastType.forecast:
+                    SemiDailyForecast = await GetWeatherAsync(coordinates, forecast);
+                    break;
+            }
         }
-        public async Task GetWeather(Forecast forecast)
+
+            
+        public async Task GetWeather(ForecastType forecast)
         {
-            weatherPeriods = await GetWeatherAsync(Coordinates, forecast);
+            switch (forecast)
+            {
+                case ForecastType.forecastHourly:
+                    HourlyForecast = await GetWeatherAsync(Coordinates, forecast);
+                    break;
+                case ForecastType.forecast:
+                    SemiDailyForecast = await GetWeatherAsync(Coordinates, forecast);
+                    break;
+            }
         }
         public async Task GetWeather()
         {
-            weatherPeriods = await GetWeatherAsync(Coordinates, PreferencedForecast);
+            HourlyForecast = await GetWeatherAsync(Coordinates, ForecastType.forecastHourly);
+            SemiDailyForecast = await GetWeatherAsync(Coordinates, ForecastType.forecast);
         }
-        public NWSService(string product, string contactInfo, Coordinates coordinates, Forecast forecast = Forecast.forecast)
+        public NWSService(string product, string contactInfo, Coordinates coordinates)
         {
             Product = product;
             ContactInfo = contactInfo;
             Coordinates = coordinates;
-            PreferencedForecast = forecast;
         }
         public NWSService(string product, string contactInfo)
         {

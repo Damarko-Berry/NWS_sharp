@@ -74,10 +74,19 @@ namespace NWS_sharp
         SSW,
         NNW
     }
-    public enum SkyCover { Clear, PartlyCloudy, MostlyCloudy, Overcast }
-    public enum  Forecast
+    public enum SkyCover { 
+        NA, 
+        Clear, 
+        Partly_Cloudy, 
+        Mostly_Cloudy, 
+        Mostly_Clear, 
+        Partly_Sunny, 
+        Mostly_Sunny, 
+        Cloudy
+    }
+    public enum  ForecastType
     {
         forecast,
-        forecastHourly,
+        forecastHourly
     }
 }

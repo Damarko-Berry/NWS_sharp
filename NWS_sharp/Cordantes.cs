@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace NWS_sharp
 {
+    [Serializable]
     public struct Coordinates
     {
         public double latitude;
@@ -12,7 +14,8 @@ namespace NWS_sharp
             latitude = lat;
             longitude = lon;
         }
+        
 
     }
-
+    
 }
