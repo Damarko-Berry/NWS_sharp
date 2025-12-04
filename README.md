@@ -1,6 +1,6 @@
 # NWS_sharp
 A simple use of the NWS (National Weather Service) API. The NWS is completely free and doesn't reqire a key to use, but they do ask that you send requests with your app's name and contact info.
-Unfortunatly, the NSW is U.S. specific, so trying to make calls for a set of coordinates outside of the US will result in an error. Before you ask: I opted for fields instead of properties for the sake of having it present in the inspector for debugging. Feel free to rewrite it to be properties. This is also a .NET standard 2.1 library.
+Unfortunatly, the NSW is U.S. specific, so trying to make calls for a set of coordinates outside of the US will result in an error. Before you ask: I opted for fields instead of properties for the sake of having it present in the Unity inspector for debugging. Feel free to rewrite it to be properties. This is also a .NET standard 2.1 library.
 
 ## Usage
 `NWSService` is the primary class.
